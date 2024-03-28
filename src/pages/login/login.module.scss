@@ -1,0 +1,18 @@
+.root {
+  margin: 0 auto;
+  margin-top: 150px;
+  max-width: 400px;
+}
+
+.title {
+  margin-bottom: 50px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 30px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  row-gap: 15px;
+}

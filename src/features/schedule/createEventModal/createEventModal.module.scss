@@ -1,0 +1,16 @@
+.body {
+  margin-top: 25px;
+}
+
+.modal {
+  top: 10px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: end;
+
+  & button {
+    margin-left: 25px;
+  }
+}

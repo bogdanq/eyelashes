@@ -1,0 +1,12 @@
+.body {
+  margin-top: 25px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: end;
+
+  & button {
+    margin-left: 25px;
+  }
+}
