@@ -1,51 +1,32 @@
+import { child, ref, set, remove, update } from "firebase/database";
+import { nanoid } from "nanoid";
+import { database } from "../../api/config";
 import { Service } from "./types";
 
-const addService = (service: Service): Promise<Service> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(service);
-    }, 1000);
-  });
+const addService =async  (service: Service): Promise<Service> => {
+  const id = nanoid()
+
+  await set(
+    child(ref(database), `servise/${id}`),{ ...service, id }
+  )
+
+  return service
 };
 
-const getServiceList = async (): Promise<Service[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: "1",
-          title: "Наращивание ресниц 1",
-          price: 2000,
-          profit: 120,
-          description: "Какое то описание",
-        },
-        { id: "2", title: "Наращивание ресниц 2", price: 2200, profit: 1500 },
-        { id: "3", title: "Наращивание ресниц 3", price: 10, profit: 4 },
-        { id: "4", title: "Наращивание ресниц 4", price: 1000, profit: 500 },
-      ]);
-    }, 1000);
-  });
+const deleteService = async (id: string): Promise<string> => {
+  await remove(child(ref(database), `servise/${id}`))
+
+  return id
 };
 
-const deleteService = (id: string): Promise<string> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(id);
-    }, 1000);
-  });
-};
+const updateService = async (service: Service): Promise<Service> => {
+  await update(child(ref(database), `servise/${service.id}`), service)
 
-const updateService = (service: Service): Promise<Service> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(service);
-    }, 1000);
-  });
+  return service
 };
 
 export const serviceApi = {
   addService,
-  getServiceList,
   deleteService,
   updateService,
 };

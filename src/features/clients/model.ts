@@ -6,6 +6,7 @@ import {
   combine,
 } from "effector";
 import { createGate } from "effector-react";
+import { clientSharedApi } from "../shared/api/clients";
 import { clientApi } from "./api";
 import { Client } from "./types";
 
@@ -14,7 +15,7 @@ export const clientGate = createGate("clients gate");
 export const searchClient = createEvent<string>();
 
 export const getClientListFx = createEffect<void, Client[], void>(async () =>
-  clientApi.getClientList(),
+  clientSharedApi.getClientList(),
 );
 
 export const addClientFx = createEffect<Client, Client, void>((client) =>

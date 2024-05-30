@@ -1,7 +1,23 @@
+export type EventServer = {
+  id: string;
+  clientId: string;
+  serviceId: string;
+  desc?: string;
+  start: string;
+  end: string;
+};
+
 export type Event = {
   id: string;
-  price: string;
-  client: string;
-  dateFrom: string;
-  dateTo: string;
+  client: {
+    label: string;
+    value: string;
+  };
+  service: {
+    label: string;
+    value: string;
+  };
+  desc?: string;
+  start: Date;
+  end: Date;
 };

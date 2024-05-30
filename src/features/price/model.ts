@@ -1,12 +1,13 @@
 import { createStore, createEffect, sample } from "effector";
 import { createGate } from "effector-react";
+import { serviceSharedApi } from "../shared/api/service";
 import { serviceApi } from "./api";
 import { Service } from "./types";
 
 export const priceGate = createGate("price gate");
 
 export const getServiceListFx = createEffect<void, Service[], void>(() =>
-  serviceApi.getServiceList(),
+  serviceSharedApi.getServiceList(),
 );
 
 export const addServiceFx = createEffect<Service, Service, void>((service) =>

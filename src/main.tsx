@@ -16,9 +16,9 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/eyelashes",
     element: <Template />,
-    errorElement: <h1>404</h1>,
+    errorElement: <h1>404 page</h1>,
     children: [
       {
         path: Routes.home.path,
@@ -51,5 +51,5 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ConfigProvider>
     <RouterProvider router={router} />
-  </ConfigProvider>,
+  </ConfigProvider>
 );

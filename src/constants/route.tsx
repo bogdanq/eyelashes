@@ -9,32 +9,32 @@ import {
 
 export const Routes = {
   home: {
-    path: "/",
+    path: "/eyelashes/",
     title: "Главная",
     icon: <CalendarOutlined />,
   },
   price: {
-    path: "/price",
+    path: "/eyelashes/price",
     title: "Услуги",
     icon: <FileTextOutlined />,
   },
   clients: {
-    path: "/clients",
+    path: "/eyelashes/clients",
     title: "Клиенты",
     icon: <TeamOutlined />,
   },
   statistics: {
-    path: "/statistics",
+    path: "/eyelashes/statistics",
     title: "Статистика",
     icon: <BarChartOutlined />,
   },
   info: {
-    path: "/info",
+    path: "/eyelashes/info",
     title: "Инфомация",
     icon: <InfoCircleOutlined />,
   },
   exist: {
-    path: "/exist",
+    path: "/eyelashes/exist",
     title: "Выход",
     icon: <LogoutOutlined />,
   },
@@ -42,7 +42,7 @@ export const Routes = {
 
 export const GuestRoutes = {
   login: {
-    path: "/login",
+    path: "/eyelashes/login",
     title: "Вход",
   },
 };

@@ -8,10 +8,11 @@ import {
 import moment from "moment";
 import { Button, Flex } from "antd";
 
-import * as dates from "../../../constants/dates";
+// import * as dates from "../../../constants/dates";
 import styles from "./calendar.module.scss";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { Event } from "../types";
 
 moment.locale("ru", {
   months:
@@ -38,29 +39,11 @@ moment.locale("ru", {
 });
 const localizer = momentLocalizer(moment);
 
-const events = [
-  {
-    id: 2,
-    title: "Иванов Иван Иванович",
-    desc: "Big conference for important people",
-    start: new Date(2024, 2, 21, 10, 30),
-    end: new Date(2024, 2, 21, 11, 30),
-  },
-  {
-    id: 14,
-    title: "Иванов Иван Иванович",
-    desc: "Big conference for important people",
-    start: new Date(2024, 2, 21, 12, 30),
-    end: new Date(2024, 2, 21, 13, 30),
-  },
-];
-
 const CustomToolbar = (
   toolbar: ToolbarProps & {
-    setOpenEventModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setOpenEventModal: React.Dispatch<React.SetStateAction<Event["id"] | null>>;
   },
 ) => {
-  console.log("toolbar", toolbar, toolbar.view);
   const goToBack = () => {
     toolbar.onNavigate("PREV");
   };
@@ -100,7 +83,7 @@ const CustomToolbar = (
         <Button
           type="primary"
           ghost
-          onClick={() => toolbar.setOpenEventModal(true)}
+          onClick={() => toolbar.setOpenEventModal("-")}
         >
           Записать
         </Button>
@@ -133,15 +116,14 @@ const CustomToolbar = (
   );
 };
 
-function eventWrapper(props) {
-  // Some data that you might have inserted into the event object
-  const event = props.event;
-
+function eventWrapper({ event, children }) {
   const wrapper = React.cloneElement(
-    props.children,
+    children,
     {},
     <Flex vertical>
-      <span style={{ textDecoration: "line-through" }}>{event.title}</span>
+      <span style={{ textDecoration: "line-through" }}>
+        {event.client.label}
+      </span>
     </Flex>,
   );
   return <div>{wrapper}</div>;
@@ -149,10 +131,12 @@ function eventWrapper(props) {
 
 export function Calendar({
   setOpenEventModal,
+  events,
 }: {
-  setOpenEventModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenEventModal: React.Dispatch<React.SetStateAction<Event["id"] | null>>;
+  events: Event[];
 }) {
-  const { components, defaultDate, max } = useMemo(
+  const { components, defaultDate } = useMemo(
     () => ({
       components: {
         eventWrapper: eventWrapper,
@@ -170,8 +154,7 @@ export function Calendar({
           <CustomToolbar {...props} setOpenEventModal={setOpenEventModal} />
         ),
       },
-      defaultDate: new Date(2024, 2, 21),
-      max: dates.add(dates.endOf(new Date(2015, 17, 1), "day"), -1, "hours"),
+      defaultDate: new Date(),
     }),
     [setOpenEventModal],
   );
@@ -180,13 +163,12 @@ export function Calendar({
     <DefaultCalendar
       style={{ height: "70vh" }}
       components={components}
-      // max={max}
       defaultDate={defaultDate}
-      defaultView={Views.WEEK}
+      defaultView={Views.MONTH}
       events={events}
       localizer={localizer}
       // showMultiDayTimes
-      onSelectEvent={(event) => console.log(event)}
+      onSelectEvent={(event) => setOpenEventModal(event.id)}
     />
   );
 }

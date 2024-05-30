@@ -1,14 +1,27 @@
 import { nanoid } from "nanoid";
-import { Modal, Button, Form, Input, Select } from "antd";
+import dayjs from "dayjs";
+import { Modal, Button, Form, Input, Select, DatePicker } from "antd";
 import styles from "./createEventModal.module.scss";
+import { Event } from "../types";
+import { useEffect } from "react";
+import { ClientsSelect } from "../../shared/clients-select";
+import { ServicesSelect } from "../../shared/services-select";
 
 const { useForm } = Form;
+
+type LocalEvent = Event & {
+  date: dayjs.Dayjs;
+  distance: number;
+};
 
 type Props = {
   isLoading?: boolean;
   open: boolean;
   closeModal: () => void;
-  onSubmit: () => void;
+  deleteEvent: (id: string) => void;
+  onSubmit: (event: Event, isEditingMode: boolean) => void;
+  event: Event | null;
+  pendingDeleteEvent: boolean;
 };
 
 export const CreateEventModal = ({
@@ -16,22 +29,55 @@ export const CreateEventModal = ({
   open,
   closeModal,
   isLoading,
+  event,
+  deleteEvent,
+  pendingDeleteEvent,
 }: Props) => {
-  const [form] = useForm<any | null>();
+  const isEditingMode = !!Object.keys(event || {}).length;
+
+  const [form] = useForm<LocalEvent | null>();
+
+  useEffect(() => {
+    if (event) {
+      form.setFieldsValue({
+        ...event,
+        date: dayjs(dayjs(event.start).format("YYYY-MM-DD HH:mm")),
+        distance: dayjs(event.end).diff(dayjs(event.start), "minutes"),
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [form, event]);
 
   const onFormSave = async () => {
     try {
-      const values = (await form.validateFields()) as any;
+      const values = await form.validateFields();
 
-      // @ts-ignore
-      onSubmit({
-        ...values,
-        id: nanoid(),
-        createdAt: new Date().toISOString(),
-      });
+      if (values) {
+        const { date, distance, ...rest } = values;
+
+        const formattedEvent: Event = {
+          ...rest,
+          start: date.toDate(),
+          end: date.add(distance, "minutes").toDate(),
+          desc: "",
+        };
+
+        onSubmit(
+          {
+            ...formattedEvent,
+            id: event?.id || nanoid(),
+          },
+          isEditingMode,
+        );
+      }
     } catch (errInfo) {
       //   console.table(errInfo);
     }
+  };
+
+  const onSelect = (item: { label: string; value: string }, field: string) => {
+    form.setFieldValue(field, item);
   };
 
   return (
@@ -43,12 +89,14 @@ export const CreateEventModal = ({
         open={open}
         footer={null}
         onCancel={closeModal}
-        title="Создание записи"
+        title={isEditingMode ? "Редактирование записи" : "Создание записи"}
       >
         <div className={styles.body}>
           <Form
             form={form}
-            initialValues={{ distance: "60" }}
+            initialValues={{
+              distance: "60",
+            }}
             onSubmitCapture={onFormSave}
           >
             <Form.Item
@@ -61,16 +109,10 @@ export const CreateEventModal = ({
                 },
               ]}
             >
-              <Select
-                placeholder="Выберите клиента"
-                options={[
-                  { label: "Клиент 1", value: "1" },
-                  { label: "Клиент 2", value: "2" },
-                ]}
-              />
+              <ClientsSelect onSelect={onSelect} />
             </Form.Item>
             <Form.Item
-              name="price"
+              name="service"
               label="Услуга"
               rules={[
                 {
@@ -79,14 +121,31 @@ export const CreateEventModal = ({
                 },
               ]}
             >
-              <Select
-                placeholder="Выберите услугу"
-                options={[
-                  { label: "Услуга 1", value: "1" },
-                  { label: "Услуга 2", value: "2" },
-                ]}
+              <ServicesSelect onSelect={onSelect} />
+            </Form.Item>
+
+            <Form.Item
+              className={styles.datepicker}
+              name="date"
+              label="Дата"
+              rules={[
+                {
+                  required: true,
+                  message: "Обязательное поле",
+                },
+              ]}
+            >
+              <DatePicker
+                getPopupContainer={(trigger) => trigger.parentElement!}
+                format="YYYY-MM-DD HH:mm"
+                // disabledDate={disabledDate}
+                // disabledTime={disabledDateTime}
+                showTime={{
+                  format: "HH:mm",
+                }}
               />
             </Form.Item>
+
             <Form.Item
               name="distance"
               label="Длительность (минуты)"
@@ -99,23 +158,21 @@ export const CreateEventModal = ({
             >
               <Input placeholder="Введите длительность сеанса" type="number" />
             </Form.Item>
-            <Form.Item
-              name="date"
-              label="Дата"
-              rules={[
-                {
-                  required: true,
-                  message: "Обязательное поле",
-                },
-              ]}
-            >
-              <Input placeholder="Дата" />
-            </Form.Item>
 
             <div className={styles.buttons}>
-              <Button onClick={closeModal} disabled={isLoading} danger>
-                Удалить запись
-              </Button>
+              {isEditingMode && (
+                <Button
+                  onClick={() => {
+                    if (event) {
+                      deleteEvent(event.id);
+                    }
+                  }}
+                  disabled={pendingDeleteEvent}
+                  danger
+                >
+                  Удалить запись
+                </Button>
+              )}
 
               <Button type="primary" htmlType="submit" loading={isLoading}>
                 Сохранить

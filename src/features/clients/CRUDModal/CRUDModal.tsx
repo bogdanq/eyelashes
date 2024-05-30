@@ -55,13 +55,16 @@ export const CRUDModal = ({
         width="98%"
         open={open}
         footer={null}
-        onCancel={closeModal}
+        onCancel={() => {
+          closeModal();
+          form.resetFields();
+        }}
         title={client ? "Редактирование клиента" : "Добавление клиента"}
       >
         <div className={styles.body}>
           <Form
             form={form}
-            initialValues={client || {}}
+            initialValues={client || { visited: 0, canceled: 0, moved: 0, name: "", phone: "", id: '', createdAt: '' }}
             onSubmitCapture={onFormSave}
           >
             <Form.Item
